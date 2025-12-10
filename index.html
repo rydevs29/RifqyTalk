@@ -2,80 +2,113 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RifqyTalk - Dual Interpreter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
         
-        /* Efek Denyut Mic */
+        /* Hapus scrollbar default tapi tetap bisa scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animasi Mic Denyut */
         .mic-active-blue {
-            animation: pulse-blue 1.5s infinite;
-            background-color: #3b82f6 !important;
-            border-color: #93c5fd !important;
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            animation: pulse-blue 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
+            background-color: #2563eb !important; /* Blue 600 */
+            border-color: #60a5fa !important;
+            transform: scale(1.1);
         }
         .mic-active-orange {
-            animation: pulse-orange 1.5s infinite;
-            background-color: #f97316 !important;
-            border-color: #fdba74 !important;
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+            animation: pulse-orange 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
+            background-color: #ea580c !important; /* Orange 600 */
+            border-color: #fb923c !important;
+            transform: scale(1.1);
         }
         
-        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
-        @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(249, 115, 22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } }
+        @keyframes pulse-blue { 
+            to { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); } 
+        }
+        @keyframes pulse-orange { 
+            to { box-shadow: 0 0 0 20px rgba(249, 115, 22, 0); } 
+        }
 
+        /* Custom Arrow pada Select */
         select { 
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
+            background-position: right 1rem center;
             background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
+            background-size: 1.2em 1.2em;
         }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="bg-black text-white h-dvh w-full flex flex-col md:flex-row overflow-hidden">
 
-    <div class="flex-1 flex flex-col p-6 border-b-2 md:border-b-0 md:border-r-2 border-white/10 relative bg-gradient-to-b from-slate-900 to-blue-900/20">
+    <div class="relative flex-1 flex flex-col h-1/2 md:h-full bg-slate-900 border-b-2 md:border-b-0 md:border-r-2 border-white/10 overflow-hidden group transition-colors duration-500 hover:bg-slate-800/80">
         
-        <div class="w-full mb-4">
-            <label class="text-xs text-blue-400 font-bold uppercase tracking-wider mb-1 block">Bahasa Saya</label>
-            <select id="langA" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition appearance-none font-semibold text-lg">
+        <div class="absolute inset-0 bg-gradient-to-b from-blue-600/10 to-transparent pointer-events-none"></div>
+
+        <div class="relative z-10 w-full p-4 md:p-6 bg-slate-900/50 backdrop-blur-sm border-b border-white/5">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <label class="text-[10px] md:text-xs text-blue-300 font-bold uppercase tracking-widest">Bahasa Saya</label>
+            </div>
+            <select id="langA" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base outline-none focus:border-blue-500 transition appearance-none font-semibold hover:bg-white/10 cursor-pointer">
                 </select>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center items-center text-center space-y-4">
-            <p id="textA" class="text-2xl md:text-3xl font-bold text-white/90 min-h-[40px]">...</p>
-            <p id="transA" class="text-lg text-blue-300/80 italic min-h-[30px]"></p>
-        </div>
+        <div class="flex-grow relative flex flex-col items-center justify-center w-full overflow-hidden">
+            <div class="w-full h-full overflow-y-auto no-scrollbar flex flex-col items-center justify-center p-4 text-center pb-24">
+                <p id="textA" class="text-xl md:text-3xl font-bold text-white leading-tight break-words max-w-2xl transition-all duration-300">...</p>
+                <p id="transA" class="text-sm md:text-lg text-blue-400/80 italic mt-3 font-medium break-words max-w-2xl"></p>
+            </div>
 
-        <div class="mt-4 flex justify-center">
-            <button id="btnA" onclick="startListening('A')" class="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center hover:bg-blue-600 hover:border-blue-400 transition-all duration-300 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-            </button>
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                <button id="btnA" onclick="startListening('A')" class="group/btn relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-800 border border-blue-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.2)] transition-all duration-300 active:scale-95 hover:bg-blue-600/20">
+                    <div class="absolute inset-0 rounded-full border border-white/10"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-9 md:w-9 text-blue-400 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
 
-    <div class="flex-1 flex flex-col p-6 relative bg-gradient-to-t from-slate-900 to-orange-900/20">
+    <div class="relative flex-1 flex flex-col h-1/2 md:h-full bg-black overflow-hidden group transition-colors duration-500 hover:bg-slate-900/80">
         
-        <div class="w-full mb-4">
-            <label class="text-xs text-orange-400 font-bold uppercase tracking-wider mb-1 block text-right">Bahasa Lawan Bicara</label>
-            <select id="langB" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500 transition appearance-none font-semibold text-lg text-right" dir="rtl">
+        <div class="absolute inset-0 bg-gradient-to-t from-orange-600/10 to-transparent pointer-events-none"></div>
+
+        <div class="relative z-10 w-full p-4 md:p-6 bg-black/50 backdrop-blur-sm border-b border-white/5 flex flex-col items-end">
+            <div class="flex items-center gap-2 mb-1">
+                <label class="text-[10px] md:text-xs text-orange-300 font-bold uppercase tracking-widest">Lawan Bicara</label>
+                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+            </div>
+            <select id="langB" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base outline-none focus:border-orange-500 transition appearance-none font-semibold hover:bg-white/10 cursor-pointer text-right" dir="rtl">
                 </select>
         </div>
 
-        <div class="flex-grow flex flex-col justify-center items-center text-center space-y-4">
-            <p id="textB" class="text-2xl md:text-3xl font-bold text-white/90 min-h-[40px]">...</p>
-            <p id="transB" class="text-lg text-orange-300/80 italic min-h-[30px]"></p>
-        </div>
+        <div class="flex-grow relative flex flex-col items-center justify-center w-full overflow-hidden">
+            <div class="w-full h-full overflow-y-auto no-scrollbar flex flex-col items-center justify-center p-4 text-center pb-24">
+                <p id="textB" class="text-xl md:text-3xl font-bold text-white leading-tight break-words max-w-2xl transition-all duration-300">...</p>
+                <p id="transB" class="text-sm md:text-lg text-orange-400/80 italic mt-3 font-medium break-words max-w-2xl"></p>
+            </div>
 
-        <div class="mt-4 flex justify-center">
-            <button id="btnB" onclick="startListening('B')" class="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center hover:bg-orange-600 hover:border-orange-400 transition-all duration-300 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-            </button>
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                <button id="btnB" onclick="startListening('B')" class="group/btn relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-900 border border-orange-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(234,88,12,0.2)] transition-all duration-300 active:scale-95 hover:bg-orange-600/20">
+                    <div class="absolute inset-0 rounded-full border border-white/10"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-9 md:w-9 text-orange-400 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div id="status" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 px-4 py-2 rounded-full text-xs font-mono border border-white/10 z-50 pointer-events-none hidden md:block">
+    <div id="status" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-800/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-bold text-slate-400 border border-white/10 z-50 pointer-events-none shadow-xl tracking-wider uppercase transition-all duration-300 opacity-0 md:opacity-100">
         Siap
     </div>
 
